@@ -31,7 +31,8 @@ TRUECAPTCHA_APIKEY = 'wMjXmBIcHcdYqO2RrsVN'
 TRUECAPTCHA_CHECK_USAGE = True
 ```
 
-3. 首次运行,开启[Gmail api](https://console.cloud.google.com/apis), 
+3. 首次运行,开启[Gmail api](https://console.cloud.google.com/apis)
+    - pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
     - 创建 OAuth 2.0 client
       - 重定向url http://localhost:36666/
       - 下载OAuth2.0 client 重命名为 credentials.json
