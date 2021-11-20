@@ -41,7 +41,7 @@ PASSWORD = os.environ.get("EUSERV_PASSWORD", "") # 密码
 
 # default value is TrueCaptcha demo credential,
 # you can use your own credential via set environment variables:
-# USERID and APIKEY
+# TRUECAPTCHA_USERID and TRUECAPTCHA_APIKEY
 # demo: https://apitruecaptcha.org/demo
 # demo2: https://apitruecaptcha.org/demo2
 # demo apikey also has a limit of 100 times per day
@@ -49,8 +49,8 @@ PASSWORD = os.environ.get("EUSERV_PASSWORD", "") # 密码
 # 'error': '101.0 above free usage limit 100 per day and no balance', 
 # 'requestId': '7690c065-70e0-4757-839b-5fd8381e65c7'
 # }
-USERID = os.environ.get("USERID", "arun56")
-APIKEY = os.environ.get("APIKEY", "wMjXmBIcHcdYqO2RrsVN")
+TRUECAPTCHA_USERID = os.environ.get("TRUECAPTCHA_USERID", "arun56")
+TRUECAPTCHA_APIKEY = os.environ.get("TRUECAPTCHA_APIKEY", "wMjXmBIcHcdYqO2RrsVN")
 
 # Telegram Bot Push https://core.telegram.org/bots/api#authorizing-your-bot
 TG_BOT_TOKEN = os.environ.get('TG_BOT_TOKEN')  # 通过 @BotFather 申请获得，示例：1077xxx4424:AAFjv0FcqxxxxxxgEMGfi22B4yh15R5uw
@@ -131,8 +131,8 @@ def captcha_solver(captcha_image_url: str, session: requests.session) -> dict:
     url = "https://api.apitruecaptcha.org/one/gettext"
 
     data = {
-        "userid": USERID,
-        "apikey": APIKEY,
+        "userid": TRUECAPTCHA_USERID,
+        "apikey": TRUECAPTCHA_APIKEY,
         "case": "mixed",
         "mode": "human",
         "data": encoded_string
@@ -188,8 +188,8 @@ def get_captcha_solver_usage() -> dict:
     url = "https://api.apitruecaptcha.org/one/getusage"
 
     params = {
-        "username": USERID,
-        "apikey": APIKEY,
+        "username": TRUECAPTCHA_USERID,
+        "apikey": TRUECAPTCHA_APIKEY,
     }
     r = requests.get(url=url, params=params)
     j = json.loads(r.text)
