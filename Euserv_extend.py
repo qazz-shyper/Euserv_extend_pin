@@ -29,6 +29,7 @@ from smtplib import SMTP_SSL, SMTPDataError
 
 import requests
 from bs4 import BeautifulSoup
+from base64 import urlsafe_b64decode
 from gmail_api import *
 
 dir_name = os.path.dirname(os.path.abspath(__file__)) + os.sep
