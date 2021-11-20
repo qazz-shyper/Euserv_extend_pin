@@ -296,8 +296,8 @@ def get_servers(sess_id: str, session: requests.session) -> {}:
     return d
 
 
-def get_verification_code(userId, service, email_id, request_time):
-    email = service.users().messages().get(userId=userId, id=email_id.get('id')).execute()
+def get_verification_code(service, email_id, request_time):
+    email = service.users().messages().get(userId='me', id=email_id.get('id')).execute()
     internalDate = float(email.get("internalDate")) / 1000
 
     if internalDate > request_time-30:
@@ -352,11 +352,11 @@ def renew(
     service = gmail_authenticate(userId=userId)
     # get emails that match the query you specify from the command lines
     while time.time() < request_time + 120: # wait 2 min
-        results = search_messages(userId, service, 'EUserv - PIN for')
+        results = search_messages(service, 'EUserv - PIN for')
         print('Email id search result:' , results)
         # for each email matched, read it (output plain/text to console & save HTML and attachments)
         if results:
-            pin_code = get_verification_code(userId, service, results[0], request_time)
+            pin_code = get_verification_code(service, results[0], request_time)
             if pin_code:
                 log('[Email] pin code:' + pin_code)
                 break
