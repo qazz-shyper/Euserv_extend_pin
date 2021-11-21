@@ -76,7 +76,7 @@ LOGIN_MAX_RETRY_COUNT = 5
 
 
 # options: True or False
-CHECK_CAPTCHA_SOLVER_USAGE = True
+TRUECAPTCHA_CHECK_USAGE = True
 
 
 user_agent = (
@@ -240,7 +240,7 @@ def login(username: str, password: str) -> (str, requests.session):
             captcha_code = handle_captcha_solved_result(solved_result)
             log("[Captcha Solver] 识别的验证码是: {}".format(captcha_code))
 
-            if CHECK_CAPTCHA_SOLVER_USAGE:
+            if TRUECAPTCHA_CHECK_USAGE:
                 usage = get_captcha_solver_usage()
                 log(
                     "[Captcha Solver] current date {0} api usage count: {1}".format(
