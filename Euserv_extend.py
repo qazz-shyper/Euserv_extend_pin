@@ -53,6 +53,8 @@ PASSWORD = os.environ.get("EUSERV_PASSWORD", "") # 密码
 TRUECAPTCHA_USERID = os.environ.get("TRUECAPTCHA_USERID", "arun56")
 TRUECAPTCHA_APIKEY = os.environ.get("TRUECAPTCHA_APIKEY", "wMjXmBIcHcdYqO2RrsVN")
 
+PIN_KEY_WORD = 'EUserv - PIN for'
+
 # Telegram Bot Push https://core.telegram.org/bots/api#authorizing-your-bot
 TG_BOT_TOKEN = os.environ.get('TG_BOT_TOKEN')  # 通过 @BotFather 申请获得，示例：1077xxx4424:AAFjv0FcqxxxxxxgEMGfi22B4yh15R5uw
 TG_USER_ID = os.environ.get('TG_USER_ID')  # 用户、群组或频道 ID，示例：129xxx206
@@ -352,7 +354,7 @@ def renew(
     service = gmail_authenticate(userId=userId)
     # get emails that match the query you specify from the command lines
     while time.time() < request_time + 120: # wait 2 min
-        results = search_messages(service, 'EUserv - PIN for')
+        results = search_messages(service, PIN_KEY_WORD)
         print('Email id search result:' , results)
         # for each email matched, read it (output plain/text to console & save HTML and attachments)
         if results:
