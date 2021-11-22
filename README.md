@@ -1,5 +1,6 @@
 # Euserv_extend_pin
 Euserv_extend captcha solver + pin code(Gmail)
+pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib beautifulsoup4 requests
 
 ## 使用说明
 
@@ -31,10 +32,11 @@ TRUECAPTCHA_APIKEY = 'wMjXmBIcHcdYqO2RrsVN'
 TRUECAPTCHA_CHECK_USAGE = True
 ```
 
-3. 首次运行,开启[Gmail api](https://console.cloud.google.com/apis)
-    - pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+3. 首次运行须在本地电脑运行获取token
+    - 开启Gmail api https://console.cloud.google.com/apis
     - 创建 OAuth 2.0 client
-      - 重定向url http://localhost:36666/
+      - Oauth 同意屏幕 如果选的测试版，需要手动添加测试用户email，要么就发布应用.
+      - 凭据 -> OAuth 2.0 client 设置 重定向url为http://localhost:36666/
       - 下载OAuth2.0 client 重命名为 credentials.json
     - 获取Gmail token
       - python3 gmail_api.py email1 email2 email3 ...
