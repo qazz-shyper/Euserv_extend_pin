@@ -1,8 +1,11 @@
 # Euserv_extend_pin
 Euserv_extend captcha solver + pin code(Gmail)
+
+## 安装依赖
 pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib beautifulsoup4 requests
 
 ## 使用说明
+
 
 1. 修改 **Euserv_extend.py** 中的用户名，密码
 
