@@ -35,7 +35,15 @@ TRUECAPTCHA_APIKEY = 'wMjXmBIcHcdYqO2RrsVN'
 TRUECAPTCHA_CHECK_USAGE = True
 ```
 
-3. 首次运行须在本地电脑运行获取token
+3. 设置代理(可选)
+
+修改py文件
+```
+socks.set_default_proxy(socks.HTTP, "127.0.0.1", 10809)
+socks.set_default_proxy(socks.SOCKS5, "127.0.0.1", 10808)
+```
+
+4. 首次运行须在本地电脑运行获取token
     - 开启Gmail api https://console.cloud.google.com/apis
     - 创建 OAuth 2.0 client
       - Oauth 同意屏幕 如果选的测试版，需要手动添加测试用户email，要么就发布应用.
@@ -45,4 +53,4 @@ TRUECAPTCHA_CHECK_USAGE = True
       - python3 gmail_api.py email1 email2 email3 ...
       - 浏览器打开console中链接，登入授权
 
-4. python3 Euserv_extend.py
+5. python3 Euserv_extend.py
