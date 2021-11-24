@@ -9,7 +9,7 @@
 
 """
 euserv auto-renew script
-       v2021.09.30
+       v2021.11.11
 * Captcha automatic recognition using TrueCaptcha API
 * Email notification
 * Add login failure retry mechanism
@@ -31,6 +31,11 @@ import requests
 from bs4 import BeautifulSoup
 from base64 import urlsafe_b64decode
 from gmail_api import *
+
+# Magic internet access
+import socks, socket
+socks.set_default_proxy()
+socket.socket = socks.socksocket
 
 dir_name = os.path.dirname(os.path.abspath(__file__)) + os.sep
 os.chdir(dir_name)
@@ -65,10 +70,6 @@ TG_API_HOST = os.environ.get('TG_API_HOST', 'api.telegram.org')   # 自建 API �
 RECEIVER_EMAIL = os.environ.get("RECEIVER_EMAIL", "")
 YD_EMAIL = os.environ.get("YD_EMAIL", "")
 YD_APP_PWD = os.environ.get("YD_APP_PWD", "")  # yandex mail 使用第三方 APP 时的授权码
-
-
-# Magic internet access
-PROXIES = {"http": "http://127.0.0.1:10808", "https": "http://127.0.0.1:10808"}
 
 
 # Maximum number of login retry

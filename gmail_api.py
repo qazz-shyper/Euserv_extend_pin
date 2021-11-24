@@ -9,6 +9,11 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 
+import os, requests, socks, socket
+socks.set_default_proxy()
+socket.socket = socks.socksocket
+
+
 dir_name = os.path.dirname(os.path.abspath(__file__)) + os.sep
 os.chdir(dir_name)
 
