@@ -2,7 +2,7 @@
 Euserv_extend captcha solver + pin code(Gmail)
 
 ## 安装依赖
-pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib beautifulsoup4 requests
+pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib beautifulsoup4 requests pysocks
 
 ## 使用说明
 
