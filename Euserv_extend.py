@@ -152,7 +152,7 @@ def handle_captcha_solved_result(solved: dict) -> str:
     that's what this function is for.
     """
     if "result" in solved:
-        solved_text = solved["result"]
+        solved_text = str(solved["result"])
         if "RESULT  IS" in solved_text:
             log("[Captcha Solver] You are using the demo apikey.")
             print("There is no guarantee that demo apikey will work in the future!")
