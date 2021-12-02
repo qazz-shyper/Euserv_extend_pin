@@ -368,7 +368,7 @@ def renew(
                     break
             time.sleep(5)
         else:
-            log('[Email] Did not recieve email for 2 minute')
+            log('[Email] Did not recieve email in 2 minutes')
             return False
     except BaseException as e:
         log('[Email] ' + str(e))
