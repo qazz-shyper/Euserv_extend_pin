@@ -119,9 +119,7 @@ def login_retry(*args, **kwargs):
                         log(str(e))
             else:
                 return ret, ret_session
-
         return inner
-
     return wrapper
 
 
@@ -303,7 +301,7 @@ def get_verification_code(service, email_id, request_time):
     email = service.users().messages().get(userId='me', id=email_id.get('id')).execute()
     internalDate = float(email.get("internalDate")) / 1000
 
-    if internalDate > request_time-30:
+    if internalDate > request_time-15:
         if email.get('payload').get('body').get('size'):
             data = urlsafe_b64decode(email.get('payload').get('body').get('data')).decode()
         else:
@@ -350,22 +348,30 @@ def renew(
         "prefix":	"kc2_customer_contract_details_extend_contract_",
         "type":	"1",
     })
+    if 'A PIN has been sent to your email address' in r.text:
+        log('[EUserv] A PIN has been sent to your email address')
+    else:
+        log('[EUserv] Send Email failed !')
+        return False
 
-    pin_code = ''
-    service = gmail_authenticate(userId=userId)
-    # get emails that match the query you specify from the command lines
-    while time.time() < request_time + 120: # wait 2 min
-        results = search_messages(service, PIN_KEY_WORD)
-        print('Email id search result:' , results)
-        # for each email matched, read it (output plain/text to console & save HTML and attachments)
-        if results:
-            pin_code = get_verification_code(service, results[0], request_time)
-            if pin_code:
-                log('[Email] pin code:' + pin_code)
-                break
-        time.sleep(5)
-        
-    if not pin_code:
+    try:
+        service = gmail_authenticate(userId=userId)
+        # get emails that match the query you specify from the command lines
+        while time.time() < request_time + 120: # wait 2 min
+            results = search_messages(service, PIN_KEY_WORD)
+            print('Email id search result:' , results)
+            # for each email matched, read it (output plain/text to console & save HTML and attachments)
+            if results:
+                pin_code = get_verification_code(service, results[0], request_time)
+                if pin_code:
+                    log('[Email] pin code:' + pin_code)
+                    break
+            time.sleep(5)
+        else:
+            log('[Email] Did not recieve email for 2 minute')
+            return False
+    except BaseException as e:
+        log('[Email] ' + str(e))
         return False
 
     r = session.post(url, headers=headers, data={
