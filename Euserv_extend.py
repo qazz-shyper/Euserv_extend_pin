@@ -117,6 +117,8 @@ def login_retry(*args, **kwargs):
                                 return sess_id, session
                     except BaseException as e:
                         log(str(e))
+                else:
+                    return None, None
             else:
                 return ret, ret_session
         return inner
@@ -486,6 +488,8 @@ if __name__ == "__main__":
         sessid, s = login(user_list[i], passwd_list[i])
         if sessid == "-1":
             log("[EUserv] 第 %d 个账号登陆失败，请检查登录信息" % (i + 1))
+            continue
+        elif not sessid:
             continue
         SERVERS = get_servers(sessid, s)
         log("[EUserv] 检测到第 {} 个账号有 {} 台 VPS，正在尝试续期".format(i + 1, len(SERVERS)))
