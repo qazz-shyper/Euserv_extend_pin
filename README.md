@@ -46,7 +46,7 @@ socks.set_default_proxy(socks.SOCKS5, "127.0.0.1", 10808)
 4. 首次运行须在本地电脑运行获取token
     - 开启Gmail api https://console.cloud.google.com/apis
     - 创建 OAuth 2.0 client
-      - Oauth 同意屏幕 如果选的测试版，需要手动添加测试用户email，要么就发布应用.
+      - Oauth 同意屏幕 发布应用.
       - 凭据 -> OAuth 2.0 client 设置 重定向url为http://localhost:36666/
       - 下载OAuth2.0 client 重命名为 credentials.json
     - 获取Gmail token
