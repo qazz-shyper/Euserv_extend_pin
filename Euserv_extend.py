@@ -237,7 +237,7 @@ def login(username: str, password: str) -> (str, requests.session):
             log("[Captcha Solver] 进行验证码识别...")
             solved_result = captcha_solver(captcha_image_url, session)
             if not "result" in solved_result:
-                print(solved)
+                print(solved_result)
                 raise KeyError("Failed to find parsed results.")
             captcha_code = handle_captcha_solved_result(solved_result)
             log("[Captcha Solver] 识别的验证码是: {}".format(captcha_code))
