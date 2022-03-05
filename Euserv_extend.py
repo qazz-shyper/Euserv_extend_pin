@@ -53,8 +53,8 @@ PASSWORD = os.environ.get("EUSERV_PASSWORD", "") # 密码
 # 'error': '101.0 above free usage limit 100 per day and no balance', 
 # 'requestId': '7690c065-70e0-4757-839b-5fd8381e65c7'
 # }
-TRUECAPTCHA_USERID = os.environ.get("TRUECAPTCHA_USERID", "arun56")
-TRUECAPTCHA_APIKEY = os.environ.get("TRUECAPTCHA_APIKEY", "wMjXmBIcHcdYqO2RrsVN")
+TRUECAPTCHA_USERID = os.environ.get("TRUECAPTCHA_USERID", "")
+TRUECAPTCHA_APIKEY = os.environ.get("TRUECAPTCHA_APIKEY", "")
 
 PIN_KEY_WORD = 'EUserv - PIN for'
 
@@ -95,30 +95,26 @@ def log(info: str):
 def login_retry(*args, **kwargs):
     def wrapper(func):
         def inner(username, password):
-            ret, ret_session = func(username, password)
             max_retry = kwargs.get("max_retry")
             # default retry 3 times
             if not max_retry:
                 max_retry = 3
             number = 0
-            if ret == "-1":
-                while number < max_retry:
-                    try:
-                        number += 1
-                        if number > 1:
-                            log("[EUserv] Login tried the {}th time".format(number))
-                        sess_id, session = func(username, password)
-                        if sess_id != "-1":
+            while number < max_retry:
+                try:
+                    number += 1
+                    if number > 1:
+                        log("[EUserv] Login tried the {}th time".format(number))
+                    sess_id, session = func(username, password)
+                    if sess_id != "-1":
+                        return sess_id, session
+                    else:
+                        if number == max_retry:
                             return sess_id, session
-                        else:
-                            if number == max_retry:
-                                return sess_id, session
-                    except BaseException as e:
-                        log(str(e))
-                else:
-                    return None, None
+                except BaseException as e:
+                    log(str(e))
             else:
-                return ret, ret_session
+                return None, None
         return inner
     return wrapper
 
@@ -219,21 +215,14 @@ def login(username: str, password: str) -> (str, requests.session):
         "subaction": "login",
         "sess_id": sess_id,
     }
-    f = session.post(url, headers=headers, data=login_data)
-    f.raise_for_status()
+    r = session.post(url, headers=headers, data=login_data)
+    r.raise_for_status()
 
     if (
-        f.text.find("Hello") == -1
-        and f.text.find("Confirm or change your customer data here") == -1
+        r.text.find("Hello") == -1
+        and r.text.find("Confirm or change your customer data here") == -1
     ):
-        if (
-            f.text.find(
-                "To finish the login process please solve the following captcha."
-            )
-            == -1
-        ):
-            return "-1", session
-        else:
+        if "To finish the login process please solve the following captcha." in r.text:
             log("[Captcha Solver] 进行验证码识别...")
             solved_result = captcha_solver(captcha_image_url, session)
             if not "result" in solved_result:
@@ -250,7 +239,7 @@ def login(username: str, password: str) -> (str, requests.session):
                     )
                 )
 
-            f2 = session.post(
+            r = session.post(
                 url,
                 headers=headers,
                 data={
@@ -260,7 +249,7 @@ def login(username: str, password: str) -> (str, requests.session):
                 },
             )
             if (
-                f2.text.find(
+                r.text.find(
                     "To finish the login process please solve the following captcha."
                 )
                 == -1
@@ -271,6 +260,25 @@ def login(username: str, password: str) -> (str, requests.session):
                 log("[Captcha Solver] 验证失败")
                 return "-1", session
 
+        if 'To finish the login process enter the PIN that you receive via email' in r.text:
+            request_time = time.time()
+            
+            c_id_re = re.search('c_id" value="(.*?)"', r.text)
+            c_id = c_id_re.group(1) if c_id_re else None
+            pin_code = wait_for_email(request_time)
+
+            payload = {
+                "pin": pin_code,
+                "Submit": "Confirm",
+                "subaction": "login",
+                "sess_id": sess_id,
+                "c_id": c_id,
+            }
+            r = session.post(url, headers=headers, data=payload)
+            if 'Logout</a>' in r.text and 'enter the PIN that you receive via email' not in r.text:
+                return sess_id, session
+            else:
+                return "-1", session
     else:
         return sess_id, session
 
@@ -279,9 +287,9 @@ def get_servers(sess_id: str, session: requests.session) -> {}:
     d = {}
     url = "https://support.euserv.com/index.iphp?sess_id=" + sess_id
     headers = {"user-agent": user_agent, "origin": "https://www.euserv.com"}
-    f = session.get(url=url, headers=headers)
-    f.raise_for_status()
-    soup = BeautifulSoup(f.text, "html.parser")
+    r = session.get(url=url, headers=headers)
+    r.raise_for_status()
+    soup = BeautifulSoup(r.text, "html.parser")
     for tr in soup.select(
         "#kc2_order_customer_orders_tab_content_1 .kc2_order_table.kc2_content_table tr"
     ):
@@ -304,7 +312,7 @@ def get_verification_code(service, email_id, request_time):
     email = service.users().messages().get(userId='me', id=email_id.get('id')).execute()
     internalDate = float(email.get("internalDate")) / 1000
 
-    if internalDate > request_time-15:
+    if internalDate > request_time-8:
         if email.get('payload').get('body').get('size'):
             data = urlsafe_b64decode(email.get('payload').get('body').get('data')).decode()
         else:
@@ -314,6 +322,26 @@ def get_verification_code(service, email_id, request_time):
         pin_code = pin_code_re.group(1) if pin_code_re else None
         return pin_code
 
+def wait_for_email(request_time):
+    try:
+        service = gmail_authenticate(userId=userId)
+        # get emails that match the query you specify from the command lines
+        while time.time() < request_time + 120: # wait 2 min
+            results = search_messages(service, PIN_KEY_WORD)
+            print('Email id search result:' , results)
+            # for each email matched, read it (output plain/text to console & save HTML and attachments)
+            if results:
+                pin_code = get_verification_code(service, results[0], request_time)
+                if pin_code:
+                    log('[Email] pin code:' + pin_code)
+                    return pin_code
+            time.sleep(5)
+        else:
+            log('[Email] Did not receive the email in 2 minutes.')
+            return False
+    except BaseException as e:
+        log('[Email] ' + str(e))
+        return False
 
 def renew(
     sess_id: str, session: requests.session, password: str, order_id: str
@@ -356,26 +384,9 @@ def renew(
     else:
         log('[EUserv] Send Email failed !')
         return False
-
-    try:
-        service = gmail_authenticate(userId=userId)
-        # get emails that match the query you specify from the command lines
-        while time.time() < request_time + 120: # wait 2 min
-            results = search_messages(service, PIN_KEY_WORD)
-            print('Email id search result:' , results)
-            # for each email matched, read it (output plain/text to console & save HTML and attachments)
-            if results:
-                pin_code = get_verification_code(service, results[0], request_time)
-                if pin_code:
-                    log('[Email] pin code:' + pin_code)
-                    break
-            time.sleep(5)
-        else:
-            log('[Email] Did not recieve email in 2 minutes')
-            return False
-    except BaseException as e:
-        log('[Email] ' + str(e))
-        return False
+    
+    pin_code = wait_for_email(request_time)
+    if not pin_code: return False
 
     r = session.post(url, headers=headers, data={
         "auth": pin_code,
