@@ -56,7 +56,7 @@ PASSWORD = os.environ.get("EUSERV_PASSWORD", "") # 密码
 TRUECAPTCHA_USERID = os.environ.get("TRUECAPTCHA_USERID", "")
 TRUECAPTCHA_APIKEY = os.environ.get("TRUECAPTCHA_APIKEY", "")
 
-PIN_KEY_WORD = 'EUserv - PIN for'
+PIN_KEY_WORD = 'EUserv PIN'
 
 # Telegram Bot Push https://core.telegram.org/bots/api#authorizing-your-bot
 TG_BOT_TOKEN = os.environ.get('TG_BOT_TOKEN')  # 通过 @BotFather 申请获得，示例：1077xxx4424:AAFjv0FcqxxxxxxgEMGfi22B4yh15R5uw
@@ -333,7 +333,7 @@ def wait_for_email(request_time):
             if results:
                 pin_code = get_verification_code(service, results[0], request_time)
                 if pin_code:
-                    log('[Email] pin code:' + pin_code)
+                    log('[Email] PIN: ' + pin_code)
                     return pin_code
             time.sleep(5)
         else:
@@ -372,7 +372,7 @@ def renew(
 
     # send pin code
     request_time = time.time()
-    log(f'[EUserv] Send pin code to {userId} Time: {unixTimeToDate(request_time)}')
+    log(f'[EUserv] Send PIN code to {userId} Time: {unixTimeToDate(request_time)}')
     r = session.post(url, headers=headers, data={
         "sess_id": sess_id,
         "subaction": "show_kc2_security_password_dialog",
