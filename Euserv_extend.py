@@ -255,7 +255,7 @@ def login(username: str, password: str) -> (str, requests.session):
                 == -1
             ):
                 log("[Captcha Solver] 验证通过")
-                return sess_id, session
+                # return sess_id, session
             else:
                 log("[Captcha Solver] 验证失败")
                 return "-1", session
@@ -279,6 +279,8 @@ def login(username: str, password: str) -> (str, requests.session):
                 return sess_id, session
             else:
                 return "-1", session
+        else:
+            return sess_id, session
     else:
         return sess_id, session
 
